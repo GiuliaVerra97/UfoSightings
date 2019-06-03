@@ -3,6 +3,9 @@ package it.polito.tdp.ufo.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+
+
+//avvistamenti
 public class Sighting {
 	private int id ;
 	private LocalDateTime datetime ;
