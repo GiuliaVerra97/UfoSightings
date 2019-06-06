@@ -1,6 +1,7 @@
 package it.polito.tdp.ufo.model;
 
 import java.time.Year;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,6 +20,18 @@ public class Model {
 	private List<String> stati;
 	private Graph<String, DefaultEdge> grafo;
 	
+	
+	//per RICORSIONE:
+	//1 struttura dati finali
+	//2 struttura dati parziale
+	//3 condizione di terminazione, dopo un determinato nodo, non ci sono più successori che non ho considerato
+	//4 generare una nuova soluzione a partire da una soluzione parziale
+	//5 dato l'ultimo nodo inserito in parziale, considero tutti i successori di quel nodo che non ho anora considerato
+	//6 filtro: alla fine, ritornerò solo una soluzione->quella per cui la size è max
+	//7 qual è il livello di ricorsione->lunghezza del percorso parziale
+	//8 il caso iniziale->parziale che contiene il mio stato di partenza
+	
+	private List<String> ottima;		//è una lista di stati in cui c'è lo stato di partenza e  un insieme di altri stati(non ripetuti)
 	
 	public Model() {
 		this.dao=new SightingsDAO();
@@ -86,11 +99,51 @@ public class Model {
 	}
 	
 	
-	/*public List<String> getRaggiungibili(){
+	public List<String> getRaggiungibili(String stato){
 		List<String> raggiungibili=new LinkedList<>();
-		DepthFirstIterator dp=new DepthFirstIterator<>(this.grafo);
+		DepthFirstIterator<String, DefaultEdge> it=new DepthFirstIterator<>(this.grafo, stato);
+		it.next();		//per saltare lo stato passato come parametro
+		while(it.hasNext()) {
+			raggiungibili.add(it.next());
+		}
+		
 		return raggiungibili;
-	}*/
+	}
+	
+	
+	
+	
+	//metodo che richiama la ricorsione
+	public List<String> getPercorsoOttimo(String partenza){
+		this.ottima=new ArrayList<String>();		//ogni volta devo ricrearmi la lista della soluzione
+		List<String> parziale=new LinkedList<String>();  //ogni volta devo crearmi la lista del parziale
+		parziale.add(partenza);		//aggiungo caso iniziale
+		cercaPercorso(parziale);
+		return ottima;
+	}
+
+
+	
+	//ricorsione
+	private void cercaPercorso(List<String> parziale) {
+
+		//condizione di terminazione
+		if(parziale.size()>ottima.size()) {
+			this.ottima=new LinkedList<String>(parziale);		//clono
+		}
+		
+		List<String> candidati=this.getSuccessori(parziale.get(parziale.size()-1));		//prendo l'ultimo elemento del parziale come parametro da passare all'interno del metodo cercaSuccessori
+		
+		for(String candidato: candidati) {
+			if(!parziale.contains(candidato)) {
+				parziale.add(candidato);
+				this.cercaPercorso(parziale);
+				parziale.remove(parziale.size()-1);		//rimuovo l'ultimo elemento della lista (prendo quello come indice)
+			}
+		}
+	}
+	
+	
 	
 	
 	

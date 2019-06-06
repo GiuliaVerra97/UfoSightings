@@ -5,6 +5,7 @@
 package it.polito.tdp.ufo;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import com.sun.javafx.collections.SetAdapterChange;
@@ -40,9 +41,50 @@ public class UfoController {
     private Button btnSequenza;
     
 
+    //successori, precedenti
     @FXML
     void handleAnalizza(ActionEvent event) {
     	
+    	txtResult.clear();
+    	
+    	String stato=boxStato.getValue();
+    	if(stato==null) {
+    		txtResult.appendText("\nSeleziona stato");
+    		return;
+    	}
+    	
+    	List<String> predecessori=this.model.getPredecessori(stato);
+    	List<String> successori=this.model.getSuccessori(stato);
+    	List<String> raggiungibili=this.model.getRaggiungibili(stato);
+    	txtResult.clear();
+    	
+    	txtResult.appendText("Predecessori:\n");
+
+    	for(String s: predecessori) {
+    		txtResult.appendText(s+" ");
+    	}
+    	
+    	
+    	txtResult.appendText("\nSuccessori:\n");
+    	for(String s: successori) {
+    		txtResult.appendText(s+" ");
+    	}
+    	
+    	
+    	txtResult.appendText("\nSi possono raggiungere");
+    	for(String s: raggiungibili) {
+    		txtResult.appendText(s+" ");
+    	}
+    			
+    	
+    	btnSequenza.setDisable(false);
+    	
+    }
+
+    //crea grafo
+    @FXML
+    void handleAvvistamenti(ActionEvent event) {
+
     	txtResult.clear();
     	
     	AnnoCount anno=boxAnno.getValue();
@@ -50,24 +92,37 @@ public class UfoController {
     		txtResult.appendText("Errore");
     	}else {
     		this.model.creaGrafo(anno.getYear());
-    		txtResult.appendText("Grafo creato");
-    		txtResult.appendText("Vertici: "+model.getNVertici()+"\n Archi "+model.getNArchi());
+    		txtResult.appendText("\nGrafo creato");
+    		txtResult.appendText("\nVertici: "+model.getNVertici()+"\n Archi "+model.getNArchi());
     	}
     	
     	this.boxStato.getItems().addAll(model.getStati());
     	
     	btnSequenza.setDisable(false);
     	
+    	
     }
 
-    @FXML
-    void handleAvvistamenti(ActionEvent event) {
-
-    }
-
+    
+    //ricorsione
     @FXML
     void handleSequenza(ActionEvent event) {
 
+    	txtResult.clear();
+    	
+    	String stato=boxStato.getValue();
+    	if(stato==null) {
+    		txtResult.appendText("\nSeleziona stato");
+    		return;
+    	}
+    	
+    	List<String> percorso=model.getPercorsoOttimo(stato);
+    	
+    	for(String s: percorso) {
+    		txtResult.appendText(s+"\n");
+    	}
+    	
+    	
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
